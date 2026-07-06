@@ -117,6 +117,28 @@
     });
   }
 
+  document.querySelectorAll("[data-auth-submit]").forEach((button) => {
+    let submitting = false;
+    const submitForm = (event) => {
+      const form = button.closest("form");
+      if (!form) return;
+      event.preventDefault();
+      if (submitting) return;
+      submitting = true;
+      window.setTimeout(() => {
+        submitting = false;
+      }, 1200);
+      if (form.requestSubmit) {
+        form.requestSubmit();
+      } else {
+        form.submit();
+      }
+    };
+
+    button.addEventListener("touchend", submitForm);
+    button.addEventListener("click", submitForm);
+  });
+
   if (window.location.hash.startsWith("#event-")) {
     window.setTimeout(() => {
       window.history.replaceState(null, "", window.location.pathname + window.location.search);

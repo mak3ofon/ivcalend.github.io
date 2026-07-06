@@ -39,7 +39,7 @@
       <label>Подтвердите пароль</label>
       <input type="password" name="password2" placeholder="Повторите пароль" autocomplete="new-password" autocapitalize="none" autocorrect="off" spellcheck="false">
 
-      <button type="submit" class="btn-main full">Зарегистрироваться</button>
+      <button type="submit" class="btn-main full" data-auth-submit>Зарегистрироваться</button>
       <p class="switch-line">Уже есть аккаунт? <a class="link" href="{{ url_for('auth_page', tab='login') }}">Войти</a></p>
     </form>
     {% else %}
@@ -50,7 +50,7 @@
       <label>Пароль</label>
       <input type="password" name="password" placeholder="Введите пароль" autocomplete="current-password" autocapitalize="none" autocorrect="off" spellcheck="false">
 
-      <button type="submit" class="btn-main full">Войти</button>
+      <button type="submit" class="btn-main full" data-auth-submit>Войти</button>
       <p class="switch-line">Нет аккаунта? <a class="link" href="{{ url_for('auth_page', tab='register') }}">Зарегистрироваться</a></p>
     </form>
     {% endif %}
