@@ -5,7 +5,7 @@ import os
 import calendar as pycalendar
 
 app = Flask(__name__)
-app.secret_key = os.environ.get("IVCALEND_SECRET_KEY", "ivcalend-local-secret")
+app.secret_key = os.environ.get("IVCALEND_SECRET_KEY", "ivcalend-session-key")
 
 DATA_FILE = "data.json"
 
@@ -40,6 +40,19 @@ def normalize_time(value):
         return datetime.strptime(value, "%H:%M").strftime("%H:%M")
     except ValueError:
         return ""
+
+
+def normalize_username(value):
+    return value.strip().lower()
+
+
+def find_user_key(data, username):
+    if username in data["users"]:
+        return username
+    for saved_username in data["users"]:
+        if saved_username.lower() == username:
+            return saved_username
+    return None
 
 
 def load_data():
@@ -105,7 +118,7 @@ def auth_page():
 
 @app.route("/register", methods=["POST"])
 def register():
-    username = request.form.get("username", "").strip()
+    username = normalize_username(request.form.get("username", ""))
     password = request.form.get("password", "")
     password2 = request.form.get("password2", "")
 
@@ -115,7 +128,7 @@ def register():
         flash("Введите имя пользователя")
         return redirect(url_for("auth_page", tab="register"))
 
-    if username in data["users"]:
+    if find_user_key(data, username):
         flash("Такой пользователь уже есть")
         return redirect(url_for("auth_page", tab="register"))
 
@@ -138,17 +151,18 @@ def register():
 
 @app.route("/login", methods=["POST"])
 def login():
-    username = request.form.get("username", "").strip()
+    username = normalize_username(request.form.get("username", ""))
     password = request.form.get("password", "")
 
     data = load_data()
-    user_record = data["users"].get(username)
+    user_key = find_user_key(data, username)
+    user_record = data["users"].get(user_key) if user_key else None
 
     if not user_record or user_record["password"] != password:
         flash("Неверный логин или пароль")
         return redirect(url_for("auth_page", tab="login"))
 
-    session["user"] = username
+    session["user"] = user_key
 
     if user_record["team"]:
         return redirect(url_for("calendar_page"))
@@ -447,4 +461,4 @@ def is_event_soon(ev):
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
