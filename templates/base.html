@@ -139,6 +139,19 @@
     button.addEventListener("click", submitForm);
   });
 
+  document.querySelectorAll("[data-auth-tab]").forEach((link) => {
+    let navigating = false;
+    const openTab = (event) => {
+      event.preventDefault();
+      if (navigating) return;
+      navigating = true;
+      window.location.assign(link.href);
+    };
+
+    link.addEventListener("touchend", openTab);
+    link.addEventListener("click", openTab);
+  });
+
   if (window.location.hash.startsWith("#event-")) {
     window.setTimeout(() => {
       window.history.replaceState(null, "", window.location.pathname + window.location.search);
