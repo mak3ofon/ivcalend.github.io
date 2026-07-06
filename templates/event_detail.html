@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="overlay-page">
+  <div class="auth-box">
+    <a href="{{ url_for('calendar_page') }}" class="close-x">✕</a>
+    <h2>{{ ev.title }}</h2>
+    <p class="detail-line">Когда: {{ format_date_ru(ev.date) }}{% if ev.time %} в {{ ev.time }}{% endif %}</p>
+    <p class="detail-line">Место: {{ ev.place if ev.place else "не указано" }}</p>
+
+    {% if ev.roles %}
+    <div class="role-chips">
+      {% for role in ev.roles %}
+      <div class="role-chip">{{ role }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <p class="detail-desc">{{ ev.desc if ev.desc else "Без описания" }}</p>
+
+    <form method="POST" action="{{ url_for('event_delete', event_id=ev.id) }}">
+      <button type="submit" class="btn-danger">Удалить ивент</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
