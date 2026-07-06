@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="overlay-page">
+  <div class="auth-box">
+    <div class="calendar-icon small">📅</div>
+
+    <div class="auth-tabs">
+      <a href="{{ url_for('auth_page', tab='login') }}" class="tab-btn {{ 'active' if tab == 'login' }}">Вход</a>
+      <a href="{{ url_for('auth_page', tab='register') }}" class="tab-btn {{ 'active' if tab == 'register' }}">Регистрация</a>
+    </div>
+
+    {% if tab == 'register' %}
+    <form class="auth-form" method="POST" action="{{ url_for('register') }}">
+      <label>Имя пользователя</label>
+      <input type="text" name="username" placeholder="Имя для входа">
+
+      <label>Пароль</label>
+      <input type="password" name="password" placeholder="Не менее 8 символов" data-password-input>
+
+      <div class="password-strength" data-password-strength>
+        <div class="strength-top">
+          <span>Сложность пароля</span>
+          <b data-strength-label>Слабый</b>
+        </div>
+        <div class="strength-track">
+          <div class="strength-fill" data-strength-fill></div>
+        </div>
+      </div>
+
+      <div class="rules-box">
+        Пароль должен содержать:
+        <ul>
+          <li>минимум 8 символов</li>
+          <li>хотя бы одну цифру</li>
+          <li>хотя бы одну букву</li>
+        </ul>
+      </div>
+
+      <label>Подтвердите пароль</label>
+      <input type="password" name="password2" placeholder="Повторите пароль">
+
+      <button type="submit" class="btn-main full">Зарегистрироваться</button>
+      <p class="switch-line">Уже есть аккаунт? <a class="link" href="{{ url_for('auth_page', tab='login') }}">Войти</a></p>
+    </form>
+    {% else %}
+    <form class="auth-form" method="POST" action="{{ url_for('login') }}">
+      <label>Имя пользователя</label>
+      <input type="text" name="username" placeholder="Имя для входа">
+
+      <label>Пароль</label>
+      <input type="password" name="password" placeholder="Введите пароль">
+
+      <button type="submit" class="btn-main full">Войти</button>
+      <p class="switch-line">Нет аккаунта? <a class="link" href="{{ url_for('auth_page', tab='register') }}">Зарегистрироваться</a></p>
+    </form>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

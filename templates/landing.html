@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="screen landing-screen">
+  <div class="landing-box">
+    <div class="calendar-icon">📅</div>
+    <h1>IvCalend</h1>
+    <p class="landing-text">Ивент-календарь команды <b>GeraldDev</b>. Планируй встречи, ивенты и договаривайся со своей командой в одном месте.</p>
+    <a href="{{ url_for('auth_page', tab='login') }}" class="btn-main">СТАРТ</a>
+  </div>
+  <div class="dev-team">
+    <h3>Наша команда</h3>
+    <div class="dev-list">
+      <div class="dev-card">Алексей — дизайнер</div>
+      <div class="dev-card">Александр — дизайнер</div>
+      <div class="dev-card">Глеб — разработчик</div>
+      <div class="dev-card">Егор — разработчик</div>
+      <div class="dev-card">Максим — тимлид</div>
+    </div>
+  </div>
+</div>
+{% endblock %}

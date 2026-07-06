@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="overlay-page">
+  <div class="auth-box">
+    <div class="calendar-icon small">🏢</div>
+    <h2>Вступить в команду</h2>
+    <form class="auth-form" method="POST" action="{{ url_for('team_join') }}">
+      <label>Название команды</label>
+      <input type="text" name="team_name" placeholder="Например, MyTeam">
+
+      <label>Персональный код</label>
+      <input type="hidden" name="code" data-code-value>
+      <div class="code-inputs" data-code-inputs>
+        <input type="text" inputmode="numeric" maxlength="1" aria-label="Первая цифра кода">
+        <input type="text" inputmode="numeric" maxlength="1" aria-label="Вторая цифра кода">
+        <input type="text" inputmode="numeric" maxlength="1" aria-label="Третья цифра кода">
+        <span class="code-dash">-</span>
+        <input type="text" inputmode="numeric" maxlength="1" aria-label="Четвёртая цифра кода">
+        <input type="text" inputmode="numeric" maxlength="1" aria-label="Пятая цифра кода">
+        <input type="text" inputmode="numeric" maxlength="1" aria-label="Шестая цифра кода">
+      </div>
+
+      <button type="submit" class="btn-main full">Вступить</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

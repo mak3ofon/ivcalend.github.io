@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="overlay-page">
+  <div class="auth-box">
+    <h2>Новое событие</h2>
+    <form class="auth-form" method="POST" action="{{ url_for('event_add') }}">
+      <label>Название</label>
+      <input type="text" name="title" placeholder="Например, встреча с партнёрами">
+
+      <label>Кто нужен</label>
+      <input type="text" name="roles" placeholder="Дизайн, презентация, организация">
+
+      <div class="two-col">
+        <div>
+          <label>День</label>
+          <input type="text" name="date" value="{{ format_date_ru(picked_date) }}" placeholder="ДД.ММ.ГГГГ" pattern="\d{2}\.\d{2}\.\d{4}">
+        </div>
+        <div>
+          <label>Время</label>
+          <input type="text" name="time" placeholder="12:30" pattern="\d{2}:\d{2}">
+        </div>
+      </div>
+
+      <label>Место</label>
+      <input type="text" name="place" placeholder="Где пройдёт">
+
+      <label>Описание</label>
+      <textarea name="desc" placeholder="Что нужно подготовить"></textarea>
+
+      <div class="tag-box">
+        <span class="tag-box-title">Метки</span>
+        <label class="checkbox-line"><input type="checkbox" name="tags" value="urgent"> Срочно</label>
+        <label class="checkbox-line"><input type="checkbox" name="tags" value="important"> Важно</label>
+      </div>
+
+      <label>Уведомить участников за</label>
+      <select name="notify_before">
+        <option value="10">10 минут</option>
+        <option value="30" selected>30 минут</option>
+        <option value="60">1 час</option>
+        <option value="1440">1 день</option>
+      </select>
+
+      <label class="checkbox-line"><input type="checkbox" name="notify_creator" checked> Уведомить и меня, как создателя</label>
+
+      <div class="modal-buttons">
+        <a href="{{ url_for('calendar_page') }}" class="btn-outline">Отменить</a>
+        <button type="submit" class="btn-main">Добавить</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IvCalend</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@500;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="{{ 'light-theme' if theme == 'light' else 'dark-theme' }} {% if logged_user and logged_team %}has-app-header{% endif %}">
+
+<a class="theme-toggle" href="{{ url_for('toggle_theme', next=request.full_path) }}" data-theme-toggle>
+  {% if theme == 'light' %}☀️{% else %}🌙{% endif %}
+</a>
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <div class="flash-box">
+      {% for message in messages %}
+        <p>{{ message }}</p>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+{% block content %}{% endblock %}
+
+<script>
+  const themeToggle = document.querySelector("[data-theme-toggle]");
+
+  if (themeToggle) {
+    themeToggle.addEventListener("click", async (event) => {
+      event.preventDefault();
+
+      try {
+        const response = await fetch(themeToggle.href, {
+          headers: { "X-Theme-Request": "smooth" }
+        });
+        const data = await response.json();
+        const isLight = data.theme === "light";
+
+        document.body.classList.toggle("light-theme", isLight);
+        document.body.classList.toggle("dark-theme", !isLight);
+        themeToggle.textContent = isLight ? "☀️" : "🌙";
+      } catch (error) {
+        window.location.href = themeToggle.href;
+      }
+    });
+  }
+
+  const passwordInput = document.querySelector("[data-password-input]");
+  const strengthLabel = document.querySelector("[data-strength-label]");
+  const strengthFill = document.querySelector("[data-strength-fill]");
+
+  if (passwordInput && strengthLabel && strengthFill) {
+    const levels = [
+      { label: "Слабый", width: "22%", className: "weak" },
+      { label: "Нормальный", width: "48%", className: "medium" },
+      { label: "Хороший", width: "74%", className: "good" },
+      { label: "Сильный", width: "100%", className: "strong" }
+    ];
+
+    const updateStrength = () => {
+      const value = passwordInput.value;
+      let score = 0;
+      if (value.length >= 8) score += 1;
+      if (/[0-9]/.test(value) && /[a-zа-яё]/i.test(value)) score += 1;
+      if (/[A-ZА-ЯЁ]/.test(value) && /[a-zа-яё]/.test(value)) score += 1;
+      if (/[^A-Za-zА-Яа-яЁё0-9]/.test(value)) score += 1;
+
+      const level = levels[Math.min(score, levels.length - 1)];
+      strengthLabel.textContent = level.label;
+      strengthFill.style.width = value ? level.width : "0";
+      strengthFill.className = `strength-fill ${level.className}`;
+    };
+
+    passwordInput.addEventListener("input", updateStrength);
+    updateStrength();
+  }
+
+  const codeBox = document.querySelector("[data-code-inputs]");
+  const codeValue = document.querySelector("[data-code-value]");
+
+  if (codeBox && codeValue) {
+    const cells = Array.from(codeBox.querySelectorAll("input"));
+    const syncCode = () => {
+      const value = cells.map((cell) => cell.value).join("");
+      codeValue.value = value.length > 3 ? `${value.slice(0, 3)}-${value.slice(3)}` : value;
+    };
+
+    cells.forEach((cell, index) => {
+      cell.addEventListener("input", () => {
+        cell.value = cell.value.replace(/\D/g, "").slice(0, 1);
+        syncCode();
+        if (cell.value && cells[index + 1]) {
+          cells[index + 1].focus();
+        }
+      });
+
+      cell.addEventListener("keydown", (event) => {
+        if (event.key === "Backspace" && !cell.value && cells[index - 1]) {
+          cells[index - 1].focus();
+        }
+      });
+
+      cell.addEventListener("paste", (event) => {
+        event.preventDefault();
+        const pasted = event.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+        pasted.split("").forEach((char, pastedIndex) => {
+          if (cells[pastedIndex]) cells[pastedIndex].value = char;
+        });
+        syncCode();
+        const next = cells[Math.min(pasted.length, cells.length) - 1];
+        if (next) next.focus();
+      });
+    });
+  }
+
+  if (window.location.hash.startsWith("#event-")) {
+    window.setTimeout(() => {
+      window.history.replaceState(null, "", window.location.pathname + window.location.search);
+    }, 500);
+  }
+</script>
+
+</body>
+</html>
