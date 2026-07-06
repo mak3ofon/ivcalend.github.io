@@ -15,7 +15,17 @@
       <input type="text" name="username" placeholder="Имя для входа">
 
       <label>Пароль</label>
-      <input type="password" name="password" placeholder="Не менее 8 символов">
+      <input type="password" name="password" placeholder="Не менее 8 символов" data-password-input>
+
+      <div class="password-strength" data-password-strength>
+        <div class="strength-top">
+          <span>Сложность пароля</span>
+          <b data-strength-label>Слабый</b>
+        </div>
+        <div class="strength-track">
+          <div class="strength-fill" data-strength-fill></div>
+        </div>
+      </div>
 
       <div class="rules-box">
         Пароль должен содержать:

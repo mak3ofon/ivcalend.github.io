@@ -7,6 +7,13 @@
     <p class="detail-line">Когда: {{ format_date_ru(ev.date) }}{% if ev.time %} в {{ ev.time }}{% endif %}</p>
     <p class="detail-line">Место: {{ ev.place if ev.place else "не указано" }}</p>
 
+    {% if ev.get("tags") %}
+    <div class="role-chips">
+      {% if "urgent" in ev.get("tags", []) %}<div class="event-tag urgent-tag">Срочно</div>{% endif %}
+      {% if "important" in ev.get("tags", []) %}<div class="event-tag important-tag">Важно</div>{% endif %}
+    </div>
+    {% endif %}
+
     {% if ev.roles %}
     <div class="role-chips">
       {% for role in ev.roles %}
@@ -17,8 +24,22 @@
 
     <p class="detail-desc">{{ ev.desc if ev.desc else "Без описания" }}</p>
 
-    <form method="POST" action="{{ url_for('event_delete', event_id=ev.id) }}">
-      <button type="submit" class="btn-danger">Удалить ивент</button>
+    <div class="response-box">
+      <div class="response-title">Ваш ответ</div>
+      <form method="POST" action="{{ url_for('event_response', event_id=ev.id) }}">
+        <div class="response-options">
+          {% for option in response_options %}
+          <button type="submit" name="answer" value="{{ option }}" class="response-btn {{ 'active' if user_response == option }}">{{ option }}</button>
+          {% endfor %}
+        </div>
+      </form>
+      {% if user_response %}
+      <p class="response-note">Вы выбрали: {{ user_response }}</p>
+      {% endif %}
+    </div>
+
+    <form class="delete-event-form" method="POST" action="{{ url_for('event_delete', event_id=ev.id) }}">
+      <button type="submit" class="btn-danger">Удалить событие</button>
     </form>
   </div>
 </div>

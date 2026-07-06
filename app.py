@@ -11,7 +11,7 @@ DATA_FILE = "data.json"
 
 MONTH_NAMES = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
                "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"]
-DAY_NAMES = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
+DAY_NAMES = ["ПН", "ВТ", "СР", "ЧТ", "ПТ", "СБ", "ВС"]
 
 
 def format_date_ru(value):
@@ -171,8 +171,8 @@ def team_join():
         flash("Введите название команды")
         return redirect(url_for("team_page"))
 
-    if len(code) < 1:
-        flash("Введите код команды")
+    if len(code) != 7 or code[3] != "-" or not code.replace("-", "").isdigit():
+        flash("Введите код в формате 123-456")
         return redirect(url_for("team_page"))
 
     data = load_data()
@@ -222,8 +222,9 @@ def calendar_page():
         day_events = []
         for ev in team_events:
             if ev["date"] == day_date_str:
-                day_events.append(ev)
                 ev["is_soon"] = is_event_soon(ev)
+                ev["user_response"] = ev.get("responses", {}).get(username)
+                day_events.append(ev)
         is_today = (year == today.year and month == today.month and day_number == today.day)
         days.append({"number": day_number, "events": day_events, "is_today": is_today})
 
@@ -308,6 +309,7 @@ def event_add():
     place = request.form.get("place", "").strip()
     desc = request.form.get("desc", "").strip()
     roles_raw = request.form.get("roles", "").strip()
+    tags = request.form.getlist("tags")
     notify_before = int(request.form.get("notify_before", 30))
     notify_creator = request.form.get("notify_creator") == "on"
 
@@ -340,6 +342,8 @@ def event_add():
         "time": event_time,
         "place": place,
         "desc": desc,
+        "tags": tags,
+        "responses": {},
         "notify_before": notify_before,
         "notify_creator": notify_creator,
         "created_by": username
@@ -367,7 +371,36 @@ def event_detail(event_id):
     if not found:
         return redirect(url_for("calendar_page"))
 
-    return render_template("event_detail.html", ev=found)
+    response_options = ["Приду", "Возможно", "Не смогу"]
+    user_response = found.get("responses", {}).get(current_user())
+    return render_template(
+        "event_detail.html",
+        ev=found,
+        response_options=response_options,
+        user_response=user_response
+    )
+
+
+@app.route("/event/<event_id>/response", methods=["POST"])
+def event_response(event_id):
+    username = current_user()
+    team = current_team()
+    if not username or not team:
+        return redirect(url_for("landing"))
+
+    answer = request.form.get("answer", "")
+    if answer not in ["Приду", "Возможно", "Не смогу"]:
+        return redirect(url_for("event_detail", event_id=event_id))
+
+    data = load_data()
+    for ev in data["events"].get(team, []):
+        if ev["id"] == event_id:
+            ev.setdefault("responses", {})
+            ev["responses"][username] = answer
+            save_data(data)
+            break
+
+    return redirect(url_for("event_detail", event_id=event_id))
 
 
 @app.route("/event/<event_id>/delete", methods=["POST"])

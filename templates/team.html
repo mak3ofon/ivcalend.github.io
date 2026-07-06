@@ -9,7 +9,16 @@
       <input type="text" name="team_name" placeholder="Например, MyTeam">
 
       <label>Персональный код</label>
-      <input type="text" name="code" placeholder="Код от руководителя">
+      <input type="hidden" name="code" data-code-value>
+      <div class="code-inputs" data-code-inputs>
+        <input type="text" inputmode="numeric" maxlength="1" aria-label="Первая цифра кода">
+        <input type="text" inputmode="numeric" maxlength="1" aria-label="Вторая цифра кода">
+        <input type="text" inputmode="numeric" maxlength="1" aria-label="Третья цифра кода">
+        <span class="code-dash">-</span>
+        <input type="text" inputmode="numeric" maxlength="1" aria-label="Четвёртая цифра кода">
+        <input type="text" inputmode="numeric" maxlength="1" aria-label="Пятая цифра кода">
+        <input type="text" inputmode="numeric" maxlength="1" aria-label="Шестая цифра кода">
+      </div>
 
       <button type="submit" class="btn-main full">Вступить</button>
     </form>

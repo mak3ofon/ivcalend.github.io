@@ -3,9 +3,22 @@
 
 <header class="app-header">
   <div class="header-left">
-    <span class="calendar-icon tiny">📅</span>
+    <span class="calendar-icon tiny"></span>
     <span class="app-title">IvCalend</span>
   </div>
+  {% if notifications %}
+  <div class="notice-strip">
+    {% for note in notifications %}
+    <div class="notice-card">
+      <a class="notice-link" href="{{ url_for('calendar_page', year=note.year, month=note.month) }}#event-{{ note.id }}">
+        <b>{{ note.title }}</b>
+        <span>Скоро начало: {{ note.time }}</span>
+      </a>
+      <a class="notice-close" href="{{ url_for('dismiss_notification', event_id=note.id, next=request.full_path) }}">✕</a>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
   <div class="header-right">
     <span class="hello-text">Вы вошли как <b>{{ logged_user }}</b></span>
     <span class="team-badge">{{ logged_team }}</span>
@@ -13,26 +26,12 @@
   </div>
 </header>
 
-{% if notifications %}
-<div class="toast-zone">
-  {% for note in notifications %}
-  <div class="toast">
-    <div class="toast-top">
-      <a class="toast-title" href="{{ url_for('calendar_page', year=note.year, month=note.month) }}#event-{{ note.id }}">{{ note.title }}</a>
-      <a class="toast-close" href="{{ url_for('dismiss_notification', event_id=note.id, next=request.full_path) }}">✕</a>
-    </div>
-    <div class="toast-body">Скоро начало: {{ note.time }}</div>
-  </div>
-  {% endfor %}
-</div>
-{% endif %}
-
 <div class="toolbar">
   <a href="{{ url_for('event_new') }}" class="btn-main">+ Новое событие</a>
   <div class="month-nav">
-    <a href="{{ url_for('calendar_page', year=prev_year, month=prev_month) }}" class="btn-outline">← Пред</a>
+    <a href="{{ url_for('calendar_page', year=prev_year, month=prev_month) }}" class="btn-outline">←</a>
     <h2>{{ month_name }} {{ year }}</h2>
-    <a href="{{ url_for('calendar_page', year=next_year, month=next_month) }}" class="btn-outline">След →</a>
+    <a href="{{ url_for('calendar_page', year=next_year, month=next_month) }}" class="btn-outline">→</a>
   </div>
 </div>
 
@@ -50,9 +49,11 @@
         <span class="day-number">{{ day.number }}</span>
         <a class="add-mini" href="{{ url_for('event_new', date='%04d-%02d-%02d' % (year, month, day.number)) }}">+</a>
       </div>
-      {% for ev in day.events %}
-      <a id="event-{{ ev.id }}" class="event-pill {{ 'soon' if ev.is_soon }}" href="{{ url_for('event_detail', event_id=ev.id) }}">{{ ev.title }}</a>
-      {% endfor %}
+      <div class="day-events">
+        {% for ev in day.events %}
+        <a id="event-{{ ev.id }}" class="event-pill {{ 'soon' if ev.is_soon }} {{ 'urgent' if 'urgent' in ev.get('tags', []) }} {{ 'important' if 'important' in ev.get('tags', []) }} {{ 'will-go' if ev.user_response == 'Приду' }} {{ 'cant-go' if ev.user_response == 'Не смогу' }}" href="{{ url_for('event_detail', event_id=ev.id) }}">{{ ev.title }}</a>
+        {% endfor %}
+      </div>
     </div>
     {% endif %}
   {% endfor %}
